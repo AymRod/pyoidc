@@ -392,8 +392,7 @@ class Message(MutableMapping):
                     else:
                         return
                 elif vtyp is bool:
-                    raise ValueError(
-                        '"{}", wrong type of value for "{}"'.format(val, skey))
+                    raise ValueError('"{}", wrong type of value for "{}"'.format(val, skey))
 
                 if isinstance(val, six.string_types):
                     self._dict[skey] = val
@@ -446,8 +445,7 @@ class Message(MutableMapping):
                 for v in val:
                     if not isinstance(v, vtype):
                         raise DecodeError(
-                            ERRTXT % (key, "type != %s (%s)" % (
-                                vtype, type(v))))
+                            ERRTXT % (key, "type != %s (%s)" % (vtype, type(v))))
 
             self._dict[skey] = val
         elif isinstance(val, dict):
