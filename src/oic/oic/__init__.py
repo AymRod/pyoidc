@@ -644,13 +644,17 @@ class Client(oauth2.Client):
                                 method="POST", request_args=None,
                                 extra_args=None, http_args=None,
                                 response_cls=AccessTokenResponse,
-                                authn_method="client_secret_basic", **kwargs):
+                                authn_method="client_secret_basic",
+                                verify=True, **kwargs):
 
         atr = oauth2.Client.do_access_token_request(self, request, scope,
                                                     state, body_type, method,
                                                     request_args, extra_args,
                                                     http_args, response_cls,
-                                                    authn_method, **kwargs)
+                                                    authn_method, verify, **kwargs)
+        if not verify:
+            # AymRod: skip verification
+            return atr
         try:
             _idt = atr['id_token']
         except KeyError:

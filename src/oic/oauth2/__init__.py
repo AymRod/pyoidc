@@ -609,7 +609,7 @@ class Client(PBase):
         else:
             return http_args
 
-    def parse_request_response(self, reqresp, response, body_type, state="",
+    def parse_request_response(self, reqresp, response, body_type, state="", verify=True,
                                **kwargs):
 
         if reqresp.status_code in SUCCESSFUL:
@@ -634,7 +634,11 @@ class Client(PBase):
             if body_type == 'txt':
                 # no meaning trying to parse unstructured text
                 return reqresp.text
-            return self.parse_response(response, reqresp.text, body_type,
+            if not verify:
+                # AymRod: skip parsing
+                return reqresp.text
+            else:
+                return self.parse_response(response, reqresp.text, body_type,
                                        state, **kwargs)
 
         # could be an error response
@@ -656,7 +660,7 @@ class Client(PBase):
         return reqresp
 
     def request_and_return(self, url, response=None, method="GET", body=None,
-                           body_type="json", state="", http_args=None,
+                           body_type="json", state="", http_args=None, verify=True,
                            **kwargs):
         """
         :param url: The URL to which the request should be sent
@@ -680,7 +684,7 @@ class Client(PBase):
         if "keyjar" not in kwargs:
             kwargs["keyjar"] = self.keyjar
 
-        return self.parse_request_response(resp, response, body_type, state,
+        return self.parse_request_response(resp, response, body_type, state, verify,
                                            **kwargs)
 
     def do_authorization_request(self, request=AuthorizationRequest,
@@ -731,7 +735,7 @@ class Client(PBase):
                                 method="POST", request_args=None,
                                 extra_args=None, http_args=None,
                                 response_cls=AccessTokenResponse,
-                                authn_method="", **kwargs):
+                                authn_method="", verify=True,  **kwargs):
 
         kwargs['authn_endpoint'] = 'token'
         # method is default POST
@@ -758,7 +762,7 @@ class Client(PBase):
 
         return self.request_and_return(url, response_cls, method, body,
                                        body_type, state=state,
-                                       http_args=http_args, **kwargs)
+                                       http_args=http_args, verify=verify, **kwargs)
 
     def do_access_token_refresh(self, request=RefreshAccessTokenRequest,
                                 state="", body_type="json", method="POST",
